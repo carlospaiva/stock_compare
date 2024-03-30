@@ -4,7 +4,8 @@ import pandas as pd
 import yfinance as yf
 from datetime import datetime, timedelta
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import load_model
+import keras
+from keras.models import load_model
 import plotly.graph_objs as go
 import requests
 
@@ -89,19 +90,16 @@ def main():
             # Load trained model based on selection
             if selected_model == "Neural Network":
                 model_url = "https://github.com/rajdeepUWE/stock_market_forecast/raw/master/KNN_model.h5"
-                model_filename = "KNN_model.h5"
+                model_filename = "KNN_model.keras"
             elif selected_model == "Random Forest":
                 model_url = "https://github.com/rajdeepUWE/stock_market_forecast/raw/master/random_forest_model.h5"
                 model_filename = "random_forest_model.h5"
-
-            # Download model file
-            download_model(model_url, model_filename)
 
             # Load model
             model = load_model(model_filename)
 
             # Compile the model with appropriate optimizer and loss function
-            model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
+            model.compile(optimizer='adam', loss='mse', metrics=[keras.metrics.MeanAbsolutePercentageError()])
 
             # Scale data
             scaler = MinMaxScaler(feature_range=(0, 1))
