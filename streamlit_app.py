@@ -1,9 +1,11 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 import yfinance as yf
 from datetime import datetime, timedelta
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 import keras
 from keras.models import load_model
 import plotly.graph_objs as go
@@ -90,7 +92,7 @@ def main():
             # Load trained model based on selection
             if selected_model == "Neural Network":
                 model_url = "https://github.com/rajdeepUWE/stock_market_forecast/raw/master/KNN_model.h5"
-                model_filename = "KNN_model.keras"
+                model_filename = "KNN_model.h5"
             elif selected_model == "Random Forest":
                 model_url = "https://github.com/rajdeepUWE/stock_market_forecast/raw/master/random_forest_model.h5"
                 model_filename = "random_forest_model.h5"
@@ -98,8 +100,7 @@ def main():
             # Load model
             model = load_model(model_filename)
 
-            # Compile the model with appropriate optimizer and loss function
-            model.compile(optimizer='adam', loss='mse', metrics=[keras.metrics.MeanAbsolutePercentageError()])
+            model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae'])
 
             # Scale data
             scaler = MinMaxScaler(feature_range=(0, 1))
@@ -118,6 +119,15 @@ def main():
             fig3.add_trace(go.Scatter(x=stock_data.index, y=stock_data['Close'], mode='lines', name='Original Price'))
             fig3.add_trace(go.Scatter(x=stock_data.index[100:], y=y_pred.flatten(), mode='lines', name='Predicted Price'))
             st.plotly_chart(fig3)
+
+            # Evaluation metrics
+            y_true = stock_data['Close'].values[100:]
+            mae = mean_absolute_error(y_true, y_pred)
+            mse = mean_squared_error(y_true, y_pred)
+
+            st.subheader('Model Evaluation')
+            st.write(f'Mean Absolute Error (MAE): {mae:.2f}')
+            st.write(f'Mean Squared Error (MSE): {mse:.2f}')
 
             # Forecasting
             forecast_dates = [stock_data.index[-1] + timedelta(days=i) for i in range(1, 31)]

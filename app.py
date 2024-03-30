@@ -4,7 +4,7 @@ import yfinance as yf
 import streamlit as st
 import plotly.graph_objs as go
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 import tensorflow as tf
 import joblib
 
@@ -13,7 +13,6 @@ def calculate_moving_average(data, window_size):
     return data.rolling(window=window_size).mean()
 
 # Function to forecast next 7 days' stock prices using Keras model
-@tf.keras.utils.register_keras_serializable()
 def forecast_next_7_days_keras(data):
     try:
         keras_model = load_model('lstm_model.keras')  # Load LSTM model for forecasting
@@ -35,7 +34,6 @@ def forecast_next_7_days_keras(data):
         return []
 
 # Function to forecast next 7 days' stock prices using Linear Regression model
-@tf.keras.utils.register_keras_serializable()
 def forecast_next_7_days_linear_regression(data):
     try:
         linear_regression_model = joblib.load('linear_regression_model.h5')  # Load Linear Regression model for forecasting
@@ -45,7 +43,6 @@ def forecast_next_7_days_linear_regression(data):
         return []
 
 # Function to forecast next 7 days' stock prices using Random Forest model
-@tf.keras.utils.register_keras_serializable()
 def forecast_next_7_days_random_forest(data):
     try:
         random_forest_model = joblib.load('random_forest_model.h5')  # Load Random Forest model for forecasting
@@ -55,7 +52,6 @@ def forecast_next_7_days_random_forest(data):
         return []
 
 # Function to forecast next 7 days' stock prices using ARIMA model
-@tf.keras.utils.register_keras_serializable()
 def forecast_next_7_days_arima(data):
     try:
         arima_model = joblib.load('arima_model.pkl')  # Load ARIMA model for forecasting
